@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Mission Control</title>
+  <title>Tasker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -13,14 +13,14 @@
       theme: {
         extend: {
           colors: {
-            'mc-bg': '#0a0a0a',
-            'mc-card': '#1a1a1a',
-            'mc-hover': '#2a2a2a',
-            'mc-border': '#2a2a2a',
-            'mc-blue': '#3b82f6',
-            'mc-green': '#10b981',
-            'mc-yellow': '#f59e0b',
-            'mc-red': '#ef4444',
+            'tasker-bg': '#0a0a0a',
+            'tasker-card': '#1a1a1a',
+            'tasker-hover': '#2a2a2a',
+            'tasker-border': '#2a2a2a',
+            'tasker-blue': '#3b82f6',
+            'tasker-green': '#10b981',
+            'tasker-yellow': '#f59e0b',
+            'tasker-red': '#ef4444',
           }
         }
       }
@@ -79,25 +79,25 @@
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   </style>
 </head>
-<body class="bg-mc-bg text-white min-h-screen">
+<body class="bg-tasker-bg text-white min-h-screen">
 
   <!-- Header -->
-  <header class="sticky top-0 bg-mc-bg/95 backdrop-blur border-b border-mc-border p-4 z-10">
+  <header class="sticky top-0 bg-tasker-bg/95 backdrop-blur border-b border-tasker-border p-4 z-10">
     <div class="flex justify-between items-center">
       <div>
         <h1 class="text-lg font-bold flex items-center gap-2">
-          <span>⚡</span> Mission Control
+          <span>⚡</span> Tasker
         </h1>
         <p id="header-stats" class="text-sm text-gray-400">Loading...</p>
       </div>
-      <button onclick="fetchBoard()" class="p-3 -m-1 rounded-lg hover:bg-mc-hover active:bg-mc-hover">
+      <button onclick="fetchBoard()" class="p-3 -m-1 rounded-lg hover:bg-tasker-hover active:bg-tasker-hover">
         <span id="refresh-icon" class="text-xl">↻</span>
       </button>
     </div>
-    <div id="stale-banner" class="hidden mt-2 py-2 px-3 bg-mc-yellow/10 rounded-lg text-xs text-mc-yellow">
+    <div id="stale-banner" class="hidden mt-2 py-2 px-3 bg-tasker-yellow/10 rounded-lg text-xs text-tasker-yellow">
       ⚠️ Offline — showing cached data from <span id="stale-time"></span>
     </div>
-    <div id="connection-status" class="hidden mt-2 py-1 px-3 bg-mc-green/10 rounded text-xs text-mc-green">
+    <div id="connection-status" class="hidden mt-2 py-1 px-3 bg-tasker-green/10 rounded text-xs text-tasker-green">
       🟢 Live
     </div>
   </header>
@@ -118,7 +118,7 @@
   <div id="sheet-backdrop" class="fixed inset-0 bg-black/60 z-20 hidden transition-opacity" onclick="closeDetail()"></div>
 
   <!-- Bottom Sheet -->
-  <div id="sheet" class="fixed bottom-0 left-0 right-0 bg-mc-card rounded-t-2xl z-30 sheet-hidden transition-transform duration-300 ease-out max-h-[85vh] overflow-hidden flex flex-col">
+  <div id="sheet" class="fixed bottom-0 left-0 right-0 bg-tasker-card rounded-t-2xl z-30 sheet-hidden transition-transform duration-300 ease-out max-h-[85vh] overflow-hidden flex flex-col">
     <!-- Drag handle -->
     <div class="flex justify-center py-3 cursor-grab" onclick="closeDetail()">
       <div class="w-10 h-1 bg-gray-600 rounded-full"></div>
@@ -131,18 +131,18 @@
   </div>
 
   <!-- Loading overlay (initial) -->
-  <div id="loading" class="fixed inset-0 bg-mc-bg flex items-center justify-center z-50">
+  <div id="loading" class="fixed inset-0 bg-tasker-bg flex items-center justify-center z-50">
     <div class="text-center">
       <div class="text-5xl mb-4 animate-pulse">⚡</div>
-      <p class="text-gray-400">Loading Mission Control...</p>
+      <p class="text-gray-400">Loading Tasker...</p>
     </div>
   </div>
 
   <!-- Error overlay -->
-  <div id="error-overlay" class="fixed inset-0 bg-mc-bg flex items-center justify-center z-50 hidden">
+  <div id="error-overlay" class="fixed inset-0 bg-tasker-bg flex items-center justify-center z-50 hidden">
     <div class="text-center p-8">
       <div class="text-5xl mb-4">🔒</div>
-      <p id="error-message" class="text-mc-red mb-4">Error</p>
+      <p id="error-message" class="text-tasker-red mb-4">Error</p>
       <p class="text-gray-400 text-sm">Check the server console for the access URL</p>
     </div>
   </div>
@@ -245,12 +245,12 @@ function renderBoard() {
 function renderSection(id, title, tasks, collapsed = false) {
   const count = tasks.length;
   const icon = id === 'pending' ? '○' : id === 'in_progress' ? '▶' : id === 'blocked' ? '✗' : '✓';
-  const color = id === 'done' ? 'text-mc-green' : id === 'blocked' ? 'text-mc-red' : id === 'in_progress' ? 'text-mc-blue' : 'text-gray-400';
+  const color = id === 'done' ? 'text-tasker-green' : id === 'blocked' ? 'text-tasker-red' : id === 'in_progress' ? 'text-tasker-blue' : 'text-gray-400';
 
   return `
     <section class="mb-6">
       <h2 class="section-header flex items-center gap-2 ${color} font-medium mb-3 text-sm uppercase tracking-wide">
-        ${title} <span class="bg-mc-card px-2 py-0.5 rounded text-xs">${count}</span>
+        ${title} <span class="bg-tasker-card px-2 py-0.5 rounded text-xs">${count}</span>
       </h2>
       <div class="space-y-3 ${collapsed ? 'hidden' : ''}" id="section-${id}">
         ${tasks.map(renderCard).join('')}
@@ -272,7 +272,7 @@ function renderCard(task) {
   const priorityClass = task.priority > 0 ? `priority-${task.priority}` : '';
 
   return `
-    <div class="task-card bg-mc-card rounded-xl p-4 border border-mc-border cursor-pointer"
+    <div class="task-card bg-tasker-card rounded-xl p-4 border border-tasker-border cursor-pointer"
          onclick="openDetail(${task.id})">
       <div class="font-medium mb-1.5 ${priorityClass}">
         <span class="text-gray-500">#${task.id}</span> ${escapeHtml(task.subject)}
@@ -321,8 +321,8 @@ async function openDetail(taskId) {
   } catch (e) {
     content.innerHTML = `
       <div class="text-center py-8">
-        <p class="text-mc-red mb-2">Failed to load task</p>
-        <button onclick="openDetail(${taskId})" class="text-mc-blue">Retry</button>
+        <p class="text-tasker-red mb-2">Failed to load task</p>
+        <button onclick="openDetail(${taskId})" class="text-tasker-blue">Retry</button>
       </div>
     `;
   }
@@ -331,9 +331,9 @@ async function openDetail(taskId) {
 function renderDetail(task, messages) {
   const canClaim = !task.owner || task.status === 'pending';
   const canComplete = task.status === 'in_progress' || task.status === 'claimed';
-  const statusColor = task.status === 'done' ? 'text-mc-green' :
-                      task.status === 'in_progress' ? 'text-mc-blue' :
-                      task.status === 'blocked' ? 'text-mc-red' : 'text-gray-400';
+  const statusColor = task.status === 'done' ? 'text-tasker-green' :
+                      task.status === 'in_progress' ? 'text-tasker-blue' :
+                      task.status === 'blocked' ? 'text-tasker-red' : 'text-gray-400';
 
   return `
     <div class="space-y-4">
@@ -343,15 +343,15 @@ function renderDetail(task, messages) {
       </div>
 
       <div class="flex flex-wrap gap-3 text-sm">
-        <div class="bg-mc-bg rounded-lg px-3 py-2">
+        <div class="bg-tasker-bg rounded-lg px-3 py-2">
           <span class="text-gray-500">Status</span>
           <p class="${statusColor} font-medium">${task.status.replace('_', ' ')}</p>
         </div>
-        <div class="bg-mc-bg rounded-lg px-3 py-2">
+        <div class="bg-tasker-bg rounded-lg px-3 py-2">
           <span class="text-gray-500">Owner</span>
           <p class="font-medium">${task.owner || 'Unassigned'}</p>
         </div>
-        <div class="bg-mc-bg rounded-lg px-3 py-2">
+        <div class="bg-tasker-bg rounded-lg px-3 py-2">
           <span class="text-gray-500">Created</span>
           <p class="font-medium">${timeAgo(task.created_at)}</p>
         </div>
@@ -360,7 +360,7 @@ function renderDetail(task, messages) {
       ${task.description ? `
         <div>
           <h3 class="text-gray-500 text-sm mb-2">Description</h3>
-          <div class="bg-mc-bg rounded-lg p-4 text-sm whitespace-pre-wrap">${escapeHtml(task.description)}</div>
+          <div class="bg-tasker-bg rounded-lg p-4 text-sm whitespace-pre-wrap">${escapeHtml(task.description)}</div>
         </div>
       ` : ''}
 
@@ -369,9 +369,9 @@ function renderDetail(task, messages) {
           <h3 class="text-gray-500 text-sm mb-2">Messages (${messages.length})</h3>
           <div class="space-y-2">
             ${messages.map(m => `
-              <div class="bg-mc-bg rounded-lg p-3 text-sm">
+              <div class="bg-tasker-bg rounded-lg p-3 text-sm">
                 <div class="flex justify-between items-start mb-1">
-                  <span class="text-mc-blue font-medium">${escapeHtml(m.from_agent)}</span>
+                  <span class="text-tasker-blue font-medium">${escapeHtml(m.from_agent)}</span>
                   <span class="text-gray-600 text-xs">${timeAgo(m.created_at)}</span>
                 </div>
                 <p class="text-gray-300">${escapeHtml(m.body)}</p>
@@ -381,24 +381,24 @@ function renderDetail(task, messages) {
         </div>
       ` : ''}
 
-      <div class="flex gap-3 pt-4 sticky bottom-0 bg-mc-card pb-2">
+      <div class="flex gap-3 pt-4 sticky bottom-0 bg-tasker-card pb-2">
         ${canClaim ? `
           <button onclick="claimTask(${task.id})"
-                  class="btn-action flex-1 bg-mc-blue hover:bg-mc-blue/80 active:bg-mc-blue/60 text-white rounded-xl font-medium transition-colors">
+                  class="btn-action flex-1 bg-tasker-blue hover:bg-tasker-blue/80 active:bg-tasker-blue/60 text-white rounded-xl font-medium transition-colors">
             Claim Task
           </button>
         ` : ''}
         ${canComplete ? `
           <button onclick="completeTask(${task.id})"
-                  class="btn-action flex-1 bg-mc-green hover:bg-mc-green/80 active:bg-mc-green/60 text-white rounded-xl font-medium transition-colors">
+                  class="btn-action flex-1 bg-tasker-green hover:bg-tasker-green/80 active:bg-tasker-green/60 text-white rounded-xl font-medium transition-colors">
             Complete
           </button>
         ` : ''}
         ${!canClaim && !canComplete && task.status === 'done' ? `
-          <div class="flex-1 text-center py-3 text-mc-green">✓ Completed</div>
+          <div class="flex-1 text-center py-3 text-tasker-green">✓ Completed</div>
         ` : ''}
         <button onclick="closeDetail()"
-                class="btn-action px-6 bg-mc-hover hover:bg-mc-border active:bg-mc-bg text-gray-300 rounded-xl transition-colors">
+                class="btn-action px-6 bg-tasker-hover hover:bg-tasker-border active:bg-tasker-bg text-gray-300 rounded-xl transition-colors">
           Close
         </button>
       </div>
@@ -527,7 +527,7 @@ document.addEventListener('visibilitychange', () => {
 // ═══════════════════════════════════════════
 function saveCache(data) {
   try {
-    localStorage.setItem('mc_board', JSON.stringify({
+    localStorage.setItem('tasker-_board', JSON.stringify({
       data,
       timestamp: Date.now()
     }));
@@ -538,7 +538,7 @@ function saveCache(data) {
 
 function loadCache() {
   try {
-    const cached = localStorage.getItem('mc_board');
+    const cached = localStorage.getItem('tasker-_board');
     return cached ? JSON.parse(cached) : null;
   } catch {
     return null;

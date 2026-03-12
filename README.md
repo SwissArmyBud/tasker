@@ -1,16 +1,18 @@
-# Mission Control
+# Tasker (formerly [Mission Control](https://github.com/alanxurox/mission-control))
 
 Shared coordination layer for [OpenClaw](https://github.com/openclaw/openclaw) agent fleets. Task board, inter-agent messaging, and activity feed — all via CLI.
 
-**Zero dependencies.** Just bash + sqlite3 (pre-installed on every Linux/macOS).
+**Quick Start:**
 
 ```
-mc init && mc register jarvis --role lead && mc add "Research competitors"
-mc board
+tasker init
+tasker register jarvis --role lead
+tasker add "Research competitors"
+tasker board
 ```
 
 ```
-═══ MISSION CONTROL ═══  14:32  agent: jarvis
+═══ TASKER ═══  14:32  agent: jarvis
 
 ── ○ pending (1) ──
   #1 Research competitors
@@ -18,95 +20,131 @@ mc board
 
 ## Why
 
-Running 3+ OpenClaw agents? You have the "who is doing what?" problem. Mission Control gives every agent a shared task board, messaging, and activity feed through a single `mc` command.
+Running 3+ OpenClaw agents? You have the "who is doing what?" problem. Tasker gives every agent a shared task board, messaging, and activity feed through a single `tasker` command.
 
 - **No Convex signup.** No React build. No npm install.
-- **SSH-queryable.** `ssh your-vps mc board`
+- **SSH-queryable.** `ssh your-vps tasker board`
 - **Works offline.** Local SQLite, no cloud dependency.
 - **OpenClaw-native.** Install as a skill, works with existing agents.
 
 ## Install
 
 ```bash
-# As OpenClaw skill (recommended)
-openclaw skills install mission-control
-
-# Or manual
-git clone https://github.com/alanxurox/mission-control.git
-chmod +x mission-control/mc
-export PATH="$PATH:$(pwd)/mission-control"
+git clone https://github.com/swissarmybud/tasker.git
+chmod +x tasker/tasker
 ```
 
-## Quick Start
+## Integration
+
+The `tasker` executable is just a bash script, and the `TASKER_AGENT` ID is just an environment variable. Making these available directly or passing via container-mounts to agent sandboxes is standard OS-ops, i.e.:
+
+```
+# Bash CLI
+cd tasker
+./tasker init
+
+export TASKER_AGENT="John"
+./tasker checkin
+```
+
+```
+# OpenClaw skill mount
+ln -s /home/$(whoami)/tasker /home/$(whoami)/.openclaw/skills/tasker
+```
+
+```
+# OpenClaw agent sandbox
+{
+  "sandbox": {
+    "docker": {
+      "env": {
+        "TASKER_AGENT": "Adam",
+        "TASKER_DB": "/workspace/tasker.db"
+      },
+      "binds": [
+        "~/.openclaw/skills/tasker/tasker:/bin/tasker:ro",
+        "~/.openclaw/skills/tasker/team.db:/workspace/tasker.db:rw"
+      ]
+    }
+  }
+}
+```
+
+## Example Workflow
 
 ```bash
-# Initialize database
-mc init
+# COORDINATOR PERSONALITY
+# - - - - - - - - - -
 
 # Register your agents
-mc register jarvis --role "team lead"
-mc register researcher --role "research & analysis"
-mc register writer --role "content creation"
+tasker register jarvis --role "team lead"
+tasker register researcher --role "research & analysis"
+tasker register writer --role "content creation"
 
 # Create tasks
-mc add "Research competitor pricing" --for researcher
-mc add "Draft blog post outline" -p 1
+tasker add "Research competitor pricing" --for researcher
+tasker add "Draft blog post outline" -p 1
 
 # Check the board
-mc board
+tasker board
+
+# AGENT PERSONALITY
+# - - - - - - - - - -
+
+# Get an ID badge
+export TASKER_AGENT=researcher
 
 # Agent claims and starts work
-MC_AGENT=researcher mc claim 1
-MC_AGENT=researcher mc start 1
+tasker claim 1
+tasker start 1
 
 # Agent completes work
-MC_AGENT=researcher mc done 1 -m "Found 5 competitors, report in /research/pricing.md"
+tasker done 1 -m "Found 5 competitors, report in /research/pricing.md"
 
 # Agents communicate
-MC_AGENT=researcher mc msg writer "Pricing research ready for your blog post" --task 2
+tasker msg writer "Pricing research ready for your blog post" --task 2
+
+# COORDINATOR PERSONALITY
+# - - - - - - - - - -
 
 # Check fleet status
-mc fleet
+tasker fleet
 
 # Activity feed
-mc feed --last 10
+tasker feed --last 10
 ```
 
 ## Agent Integration
 
-Add to each agent's cron (heartbeat):
-```
-*/10 * * * * MC_AGENT=myagent /path/to/mc checkin
-```
-
 Add to each agent's AGENTS.md or system prompt:
 ```
-Before starting work, run: mc inbox --unread && mc list --status pending
-After completing work, run: mc done <id> -m "what I did"
+Before starting work, run: `tasker inbox --unread`
+To get your current work, run: `tasker list --status claimed --mine`
+After completing work, run: tasker done <id> -m "what I did"
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `mc init` | Create database |
-| `mc add "Subject"` | Create task |
-| `mc list` | List tasks |
-| `mc claim <id>` | Claim task |
-| `mc start <id>` | Begin work |
-| `mc done <id>` | Complete task |
-| `mc board` | Kanban view |
-| `mc msg <agent> "body"` | Send message |
-| `mc inbox` | Read messages |
-| `mc fleet` | Agent status |
-| `mc feed` | Activity log |
-| `mc summary` | Fleet overview |
+| `tasker init` | Create database |
+| `tasker add "Subject"` | Create task |
+| `tasker list` | List tasks |
+| `tasker claim <id>` | Claim task |
+| `tasker start <id>` | Begin work |
+| `tasker done <id>` | Complete task |
+| `tasker board` | Kanban view |
+| `tasker msg <agent> "body"` | Send message |
+| `tasker inbox` | Read messages |
+| `tasker fleet` | Agent status |
+| `tasker feed` | Activity log |
+| `tasker summary` | Fleet overview |
 
 ## Architecture
 
 ```
 ┌─────────────────────┐
-│    mc CLI (bash)     │ ← Every agent calls this
+│    tasker CLI (bash)     │ ← Every agent calls this
 ├─────────────────────┤
 │  SQLite (WAL mode)  │ ← ~/.openclaw/mission-control.db
 ├─────────────────────┤
@@ -122,8 +160,8 @@ After completing work, run: mc done <id> -m "what I did"
 
 | Var | Default | Description |
 |-----|---------|-------------|
-| `MC_AGENT` | `$USER` | Agent identity |
-| `MC_DB` | `~/.openclaw/mission-control.db` | Database path |
+| `TASKER_AGENT` | `$USER` | Agent identity |
+| `TASKER_DB` | `~/.openclaw/mission-control.db` | Database path |
 
 ## License
 

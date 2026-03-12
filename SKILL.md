@@ -1,69 +1,55 @@
-# Mission Control
+---
+name: tasker
+description: Allows cross-agent planning and coordination of work deliverables.
+---
 
-Shared coordination layer for OpenClaw agent fleets. Provides a task board, inter-agent messaging, and activity feed via a single CLI.
+# Tasker
 
-## Setup
+Shared coordination layer for OpenClaw agent fleets. Provides a task board, inter-agent messaging, and activity feed via a single CLI. Execute the `tasker` binary from this folder to do work.
 
-Run `mc init` to create the database. Set your identity: `export MC_AGENT=your-name`
-
-## Operational Rhythm
-
-Every agent should follow this pattern:
-
-1. **On startup:** `mc checkin` (registers presence)
-2. **Every 10-15 min:** `mc checkin` via cron (heartbeat)
-3. **Before work:** `mc inbox --unread` (check messages), `mc list --status pending` (find work)
-4. **Claim work:** `mc claim <id>` then `mc start <id>`
-5. **During work:** `mc msg <agent> "update" --task <id>` (coordinate)
-6. **After work:** `mc done <id> -m "what I did"` then check for next task
-
-## Decision Tree
-
-| Situation | Command |
-|-----------|---------|
-| New idea/task | `mc add "Subject" -d "Details"` |
-| Want to work | `mc list --status pending` then `mc claim <id>` |
-| Stuck/blocked | `mc msg <lead> "Blocked on X" --task <id> --type question` |
-| Finished | `mc done <id> -m "Result"` |
-| Need review | `mc msg <reviewer> "Ready" --task <id> --type handoff` |
-| Catching up | `mc feed --last 20` or `mc summary` |
-
-## Task Statuses
-
-```
-pending → claimed → in_progress → review → done
-                  ↘ blocked ↗         ↘ cancelled
+## Quick Start
+```bash
+export TASKER_AGENT=<your‑name>
+tasker checkin
+tasker inbox --unread
 ```
 
-## CLI Reference
+## Workflow
+1. **Read messages first** – `tasker inbox --unread` (review new tasks, updates, and blockers)
+2. **Pick a task** – `tasker list --status claimed --mine`
+3. **Start work** – `tasker start <id>`
+4. **Communicate** – `tasker msg <agent> "update" --task <id>` (only for important changes)
+5. **Finish** – `tasker done <id> -m "Result"` and claim next task
+
+## Commands Overview
 
 ### Tasks
-```
-mc add "Subject" [-d "description"] [-p 0|1|2] [--for agent]
-mc list [--status STATUS] [--owner AGENT] [--mine]
-mc claim <id>
-mc start <id>
-mc done <id> [-m "note"]
-mc block <id> --by <other-id>
-mc board
-```
+- `tasker add "Subject" [-d "details"] [-p 0|1|2] [--for <agent>]`
+- `tasker list [--status <status>] [--owner <agent>] [--mine]`
+- `tasker claim <id>`
+- `tasker start <id>`
+- `tasker done <id> [-m "note"]`
+- `tasker block <id> --by <other-id>`
+- `tasker board`
 
 ### Messages
-```
-mc msg <agent> "body" [--task <id>] [--type TYPE]
-mc broadcast "body"
-mc inbox [--unread]
-```
+- `tasker msg <agent> "body" [--task <id>] [--type <type>]`
+- `tasker broadcast "body"`
+- `tasker inbox [--unread]`
 
 ### Fleet
-```
-mc checkin
-mc register <name> [--role role]
-mc fleet
-```
+- `tasker checkin`
+- `tasker register <name> [--role <role>]`
+- `tasker fleet`
 
 ### Feed
+- `tasker feed [--last N] [--agent <name>]`
+- `tasker summary`
+
+## Status Ladder
 ```
-mc feed [--last N] [--agent NAME]
-mc summary
+pending → claimed → in_progress → review → done
+          ↘ blocked ↗         ↘ cancelled
 ```
+
+Keep prompts short, focus on actionable steps, and retain the core CLI for seamless swarm coordination.

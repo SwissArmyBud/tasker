@@ -1,4 +1,4 @@
--- Mission Control Schema v0.1
+-- Tasker Schema v0.1
 -- Shared coordination layer for OpenClaw agent fleets
 -- Compatible with ~/.claude/tasks/ JSON schema
 

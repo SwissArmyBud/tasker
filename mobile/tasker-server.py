@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mission Control Mobile Server — Token auth + SSE"""
+"""Tasker Backend Server — Token auth + SSE"""
 import os
 import json
 import time
@@ -8,7 +8,7 @@ import sqlite3
 from flask import Flask, jsonify, request, Response, send_from_directory
 
 app = Flask(__name__)
-DB = os.path.expanduser('~/.openclaw/mission-control.db')
+DB = os.path.expanduser('~/tasker/tasker.db')
 TOKEN = secrets.token_urlsafe(16)
 
 # ═══════════════════════════════════════════
@@ -174,7 +174,7 @@ def heartbeat():
 
 if __name__ == '__main__':
     print(f"\n{'='*50}")
-    print(f"  Mission Control Mobile Server")
+    print(f"  Tasker Backend Server")
     print(f"{'='*50}")
     print(f"\n  Local URL:")
     print(f"  http://localhost:3737/?token={TOKEN}")
